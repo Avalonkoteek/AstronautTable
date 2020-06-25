@@ -1,6 +1,14 @@
 <template>
   <div id="app">
     <AstonautTable />
+    <Paginate
+      :page-count="20"
+      :click-handler="listChangeHandler"
+      :prev-text="'Назад'"
+      :next-text="'Вперед'"
+      :container-class="'pagination'"
+      :page-class="'waves-effect'"
+    />
   </div>
 </template>
 
@@ -11,6 +19,9 @@ export default {
   name: "App",
   components: {
     AstonautTable,
+  },
+  methods: {
+    listChangeHandler() {},
   },
 };
 </script>

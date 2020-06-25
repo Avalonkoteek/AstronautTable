@@ -18,6 +18,8 @@
         <td>{{ person.mission }}</td>
         <td>{{ person.days }}</td>
         <td>
+          <i class="material-icons">date_range</i>
+
           {{ person.date | date() }}
         </td>
         <td>
