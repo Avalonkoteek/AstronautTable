@@ -9,7 +9,14 @@ export default {
     };
   },
   methods: {
-    setupPagination(allItems) {},
+    setupPagination(allItems) {
+      this.allItems = this.chunk(allItems, this.pageSize - 1);
+      this.pageCount = this.allItems.length;
+      this.items = this.allItems[this.page - 1] || this.allItems[0];
+    },
+    listChangeHandler(page) {
+      this.items = this.allItems[page - 1] || this.allItems[0];
+    },
     chunk(arr, size) {
       return arr.reduce(
         (subArr, currentItem) => {

@@ -12,6 +12,11 @@ export default new Vuex.Store({
     setAstronautToStore: (state, astronauts) => {
       state.astronauts = astronauts;
     },
+    deleteAstronautToStoreById: (state, id) => {
+      state.astronauts = state.astronauts.filter(
+        (el, index) => word.length > 6
+      );
+    },
   },
   actions: {
     async fetchAstronauts({ commit, dispatch }) {
@@ -19,6 +24,7 @@ export default new Vuex.Store({
         const res = await axios("http://localhost:3000/astronauts", {
           method: "GET",
         });
+        commit("setAstronautToStore", res.data);
         return await res.data;
       } catch (e) {
         console.log(e);
