@@ -9,8 +9,8 @@ export default new Vuex.Store({
     astronauts: [],
   },
   mutations: {
-    setAstronautToStore: (state, astronauts) => {
-      state.astronauts = astronauts;
+    setAstronautToStore: (state, newAstronautsList) => {
+      state.astronauts = newAstronautsList;
     },
     deleteAstronautToStoreById: (state, id) => {
       state.astronauts = state.astronauts.filter(
@@ -25,7 +25,6 @@ export default new Vuex.Store({
           method: "GET",
         });
         commit("setAstronautToStore", res.data);
-        return await res.data;
       } catch (e) {
         console.log(e);
       }

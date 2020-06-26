@@ -4,6 +4,9 @@ import store from "./store";
 import Paginate from "vuejs-paginate";
 import { Datetime } from "vue-datetime";
 import dateFilter from "./filters/date.filter";
+import noUiSlider from "nouislider";
+
+import "nouislider/distribute/nouislider.css";
 
 import "materialize-css/dist/js/materialize.min";
 import "vue-datetime/dist/vue-datetime.css";

@@ -53,7 +53,7 @@
 <style scoped>
 .addForm {
   background-color: #e8f3fb;
-  box-shadow: 25px 28px 66px rgba(176, 195, 210, 0.727846);
+  box-shadow: 25px 28px 66px rgba(176, 195, 210, 0.45);
   border-radius: 5px;
   padding: 40px 0;
 }
