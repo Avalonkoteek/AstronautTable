@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="container">
     <AstonautFilter />
-    <AstonautTable :table="items" />
+    <AstonautTable :table="items" :key="getItems" />
     <Paginate
       :page-count="pageCount"
       :click-handler="listChangeHandler"
@@ -25,16 +25,23 @@ export default {
   components: {
     AstonautTable,
     AddAstonaut,
-    AstonautFilter,
+    AstonautFilter
+  },
+  computed: {
+    getItems() {
+      const astronauts = this.$store.getters.astronauts;
+      this.setupPagination(astronauts);
+      console.log(this.page);
+      return 1;
+    }
   },
   mixins: [paginationMixin],
   async mounted() {
     await this.$store.dispatch("fetchAstronauts");
-
-    const astronauts = this.$store.state.astronauts;
+    const astronauts = this.$store.getters.astronauts;
     this.setupPagination(astronauts);
     console.log(this.items);
-  },
+  }
 };
 </script>
 

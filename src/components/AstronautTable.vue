@@ -1,27 +1,32 @@
 <template>
   <div class="astronautTable">
-    <table class="responsive-table ">
+    <table class="responsive-table">
       <thead>
         <tr>
           <th>#</th>
+
           <th class="sortRow" @click="sortByName">
             <div class="test">
-              Имя<i class="small material-icons">arrow_drop_down</i>
+              Имя
+              <i class="small material-icons">arrow_drop_down</i>
             </div>
           </th>
           <th class="sortRow" @click="sortByMissions">
             <div class="test">
-              Миссии<i class="small material-icons">arrow_drop_down</i>
+              Миссии
+              <i class="small material-icons">arrow_drop_down</i>
             </div>
           </th>
           <th class="sortRow" @click="sortByDay">
             <div class="test">
-              Дней в космосе<i class="small material-icons">arrow_drop_down</i>
+              Дней в космосе
+              <i class="small material-icons">arrow_drop_down</i>
             </div>
           </th>
           <th class="sortRow" @click="sortByDate">
             <div class="test">
-              Первый полет<i class="small material-icons">arrow_drop_down</i>
+              Первый полет
+              <i class="small material-icons">arrow_drop_down</i>
             </div>
           </th>
 
@@ -36,11 +41,15 @@
           <td>{{ person.mission }}</td>
           <td>{{ person.days }}</td>
           <td>{{ person.date | date() }}</td>
-          <td>{{ person.isMultiple }}</td>
+          <td>{{ person.isMultiple?"Да":"Нет" }}</td>
           <td>
-            <a class="btn" v-bind:data-id="idx" @click.prevent="deleteById"
-              >del</a
+            <a
+              class="btn waves-effect waves-light red lighten-2"
+              v-bind:data-id="person.name"
+              @click.prevent="deleteById"
             >
+              <i class="small material-icons">delete</i>
+            </a>
           </td>
         </tr>
       </tbody>
@@ -52,91 +61,54 @@ export default {
   name: "AstronautTable",
   data: () => ({
     loading: true,
+    tableHeader: [
+      { text: "Имя", attr: "name" },
+      { text: "Миссии", attr: "mission" },
+      { text: "Дней в космосе", attr: "days" },
+      { text: "Первый полет", attr: "date" }
+    ]
   }),
   props: {
-    table: Array,
+    table: Array
   },
-
   methods: {
-    deleteById(id) {
-      console.log(id);
+    deleteById(event) {
+      let $delButton = event.target;
+      if (event.target.tagName === "I") $delButton = event.target.parentNode;
+      const name = $delButton.dataset.id;
+
+      this.$store.commit("deleteAstronautById", name);
     },
     sortByName(event) {
       this.updateArrowClass(event);
       const astronauts = this.$store.state.astronauts;
-      astronauts.sort((a, b) => {
-        if (a.name > b.name) {
-          return 1;
-        }
-        if (a.name < b.name) {
-          return -1;
-        }
-        return 0;
-      });
-      console.log(astronauts);
+      const type = "name";
+      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
     },
     sortByMissions() {
-      const astronauts = this.$store.state.astronauts;
-      astronauts.sort((a, b) => {
-        const aa = a.mission.split("").reduce((acc, currentVal, index) => {
-          if (currentVal === "/") acc++;
-          return acc;
-        }, 0);
-
-        const bb = b.mission.split("").reduce((acc, currentVal, index) => {
-          if (currentVal === "/") acc++;
-          return acc;
-        }, 0);
-
-        if (aa > bb) {
-          return 1;
-        }
-
-        if (aa < bb) {
-          return -1;
-        }
-        return 0;
-      });
-      console.log("sortByMissions");
-      console.log(astronauts.reverse());
       this.updateArrowClass(event);
+      const astronauts = this.$store.state.astronauts;
+      const type = "missions";
+      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
     },
-    sortByDay() {
-      const astronauts = this.$store.state.astronauts;
-      astronauts.sort((a, b) => {
-        if (a.days > b.days) {
-          return 1;
-        }
-        if (a.days < b.days) {
-          return -1;
-        }
-        return 0;
-      });
+    sortByDay(event) {
       this.updateArrowClass(event);
-      console.log("sortByDay");
-      console.log(astronauts);
+      const astronauts = this.$store.state.astronauts;
+      const type = "days";
+      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
     },
-    sortByDate() {
-      const astronauts = this.$store.state.astronauts;
-      astronauts.sort((a, b) => {
-        if (a.date > b.date) {
-          return 1;
-        }
-        if (a.date < b.date) {
-          return -1;
-        }
-        return 0;
-      });
+    sortByDate(event) {
       this.updateArrowClass(event);
-      console.log("sortByDate");
-      console.log(astronauts);
+      const astronauts = this.$store.state.astronauts;
+      const type = "date";
+      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
     },
     updateArrowClass(event) {
       let arrowParent = event.target;
       if (event.target.tagName === "I") arrowParent = event.target.parentNode;
       arrowParent.classList.toggle("up");
-    },
-  },
+    }
+  }
 };
 </script>
 <style scoped>
