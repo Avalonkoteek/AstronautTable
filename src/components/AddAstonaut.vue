@@ -1,9 +1,13 @@
 <template>
   <div class="addForm">
-    <h4 class="addForm__title">Добавить нового астронавта</h4>
+    <h4 class="addForm__title">Добавить нового космонавта</h4>
+
+    <!-- ------------------- Форма ------------------------ -->
+
     <form @submit.prevent="submitHandler">
       <div class="row">
-        <!-- ИМЯ -->
+        <!-- --------------- Имя -------------------------- -->
+
         <div class="input-field col s4">
           <input
             id="name"
@@ -14,7 +18,9 @@
           <label for="name">Имя</label>
           <small v-if="$v.name.$dirty && !$v.name.required">Введите имя космонавта</small>
         </div>
-        <!-- Миссии -->
+
+        <!-- --------------- Миссии ------------------------- -->
+
         <div class="input-field col s4">
           <input
             id="mission"
@@ -25,7 +31,9 @@
           <label for="mission">Миссии</label>
           <small v-if="$v.mission.$dirty && !$v.mission.required">Введите название миссии/миссий</small>
         </div>
-        <!-- Дни -->
+
+        <!-- --------------- Дни ---------------------------- -->
+
         <div class="input-field col s4">
           <input
             id="days"
@@ -41,29 +49,31 @@
       </div>
 
       <div class="row flex-bottom">
-        <!-- Повторные полеты -->
+        <!-- --------------- Селектор: повторные полеты ------ -->
+
         <div class="input-field col s4">
-          <select
-            v-model="isMultiple"
-            :class="{invalid:($v.isMultiple.$dirty && !$v.isMultiple.required)}"
-          >
-            <option value disabled selected>Были повторные полеты?</option>
-            <option value="1" selected>Да</option>
-            <option value="2">Нет</option>
+          <select v-model="isMultiple">
+            <option value="1">Да</option>
+            <option value="0">Нет</option>
           </select>
           <label>Повторные полеты</label>
         </div>
-        <!-- Дата первого полета -->
+
+        <!-- --------------- Дата первого полета ------------ -->
+
         <div class="date col s4">
           <label>Дата первого полета</label>
           <input
             placeholder="dd-mm-yyyy"
             type="text"
+            @click="changeDateValid"
             class="datepicker"
-            v-model="date"
-            :class="{invalid:($v.date.$dirty && !$v.date.required)}"
+            :class="{invalid: !isDateValid}"
           />
         </div>
+
+        <!-- --------------- Кнопка -------------------------- -->
+
         <div class="col s4 button">
           <button class="btn waves-effect waves-light" type="submit">
             Отправить
@@ -74,9 +84,11 @@
     </form>
   </div>
 </template>
+
 <script>
 import { required, minValue } from "vuelidate/lib/validators";
 import datepickerMixin from "../mixins/datepicker.mixin";
+
 export default {
   name: "AddAstronaut",
   data: () => ({
@@ -84,32 +96,83 @@ export default {
     mission: "",
     days: 1,
     isMultiple: null,
-    date: ""
+    isDateValid: true,
+    formData: {}
   }),
+
+  // правила для алидации полей
+
   validations: {
     name: { required },
     mission: { required },
     days: { minValue: minValue(1) },
-    isMultiple: { required },
-    date: { required }
+    isMultiple: { required }
   },
+
   mixins: [datepickerMixin],
+
   mounted() {
+    // Инициализирум календарь и селектор
     this.initDatePicker();
+    this.initSelect();
+    // обновляем поля для избегания бага перекрытия label и значения input
     M.updateTextFields();
-    const select = document.querySelectorAll("select");
-    const selectInstance = M.FormSelect.init(select, {});
   },
+
   methods: {
-    submitHandler() {
-      if (this.$v.$invalid) {
+    async submitHandler() {
+      this.updateSelectInputClass();
+      const datepickerValue = this.getDatepickerValue();
+      this.isDateValid = !!datepickerValue;
+
+      if (this.$v.$invalid || !this.isDateValid) {
         this.$v.$touch();
-        const elem = document.querySelectorAll(".datepicker");
-        let instance = M.Datepicker.getInstance(elem);
-        console.log(instance);
         return;
       }
-      console.log("submit");
+      const formatDate = Date.parse(datepickerValue.split("-").reverse());
+      const formatIsMultiple = !!+this.isMultiple;
+
+      this.formData = {
+        name: this.name,
+        date: formatDate,
+        days: this.days,
+        mission: this.mission,
+        isMultiple: formatIsMultiple
+      };
+      await this.$store.dispatch("addAstronaut", this.formData);
+
+      this.name = "";
+      this.mission = "";
+      this.days = 1;
+      this.isMultiple = null;
+      this.isDateValid = true;
+      this.formData = {};
+      const datepicker = document.querySelector(".datepicker");
+      let instance = M.Datepicker.getInstance(datepicker);
+      instance.destroy();
+      this.$v.$reset();
+      this.$message("Космонавт успешно добавлен в таблицу!");
+    },
+
+    initSelect() {
+      const select = document.querySelectorAll("select");
+      M.FormSelect.init(select, {});
+    },
+
+    changeDateValid() {
+      this.isDateValid = true;
+    },
+
+    updateSelectInputClass() {
+      const selectInput = document.querySelector(".select-dropdown");
+      if (!this.$v.isMultiple.required) selectInput.classList.add("invalid");
+      else selectInput.classList.remove("invalid");
+    },
+
+    getDatepickerValue() {
+      const datepicker = document.querySelector(".datepicker");
+      let instance = M.Datepicker.getInstance(datepicker);
+      return instance.toString();
     }
   }
 };

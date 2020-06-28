@@ -13,6 +13,9 @@ export default new Vuex.Store({
     setAstronautToState: (state, newAstronautsList) => {
       state.astronauts = newAstronautsList;
     },
+    addAstronaut: (state, astronaut) => {
+      state.astronauts = [...state.astronauts, astronaut];
+    },
     deleteAstronautById: (state, name) => {
       state.astronauts = state.astronauts.filter(
         (el, index) => el.name !== name
@@ -34,6 +37,9 @@ export default new Vuex.Store({
       } catch (e) {
         console.log(e);
       }
+    },
+    async addAstronaut({ commit }, formData) {
+      commit("addAstronaut", formData);
     },
   },
   modules: { sorting },

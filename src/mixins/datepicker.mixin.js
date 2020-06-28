@@ -47,7 +47,7 @@ export default {
       };
 
       const options = {
-        format: "dd-mmmm-yyyy",
+        format: "dd-mm-yyyy",
         maxDate: new Date(),
         i18n: RULocale,
       };
