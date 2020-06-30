@@ -4,7 +4,10 @@
 ```
 npm install
 ```
-
+### Run database launch
+```
+npm run json
+```
 ### Compiles and hot-reloads for development
 ```
 npm run serve
