@@ -13,7 +13,7 @@
             id="name"
             type="text"
             v-model.trim="name"
-            :class="{invalid:($v.name.$dirty && !$v.name.required)}"
+            :class="{ invalid: $v.name.$dirty && !$v.name.required }"
           />
           <label for="name">Имя</label>
           <small v-if="$v.name.$dirty && !$v.name.required">Введите имя космонавта</small>
@@ -26,7 +26,7 @@
             id="mission"
             type="text"
             v-model.trim="mission"
-            :class="{invalid:$v.mission.$dirty && !$v.mission.required}"
+            :class="{ invalid: $v.mission.$dirty && !$v.mission.required }"
           />
           <label for="mission">Миссии</label>
           <small v-if="$v.mission.$dirty && !$v.mission.required">Введите название миссии/миссий</small>
@@ -39,12 +39,13 @@
             id="days"
             type="number"
             v-model.trim="days"
-            :class="{invalid:$v.days.$dirty && !$v.days.minValue}"
+            :class="{ invalid: $v.days.$dirty && !$v.days.minValue }"
           />
           <label for="days">Дней в космосе</label>
-          <small
-            v-if="$v.days.$dirty && !$v.days.minValue"
-          >Минимальное значение: {{$v.days.$params.minValue.min}}, сейчас: {{$v.days.$model}}</small>
+          <small v-if="$v.days.$dirty && !$v.days.minValue">
+            Минимальное значение: {{ $v.days.$params.minValue.min }}, сейчас:
+            {{ $v.days.$model }}
+          </small>
         </div>
       </div>
 
@@ -68,7 +69,7 @@
             type="text"
             @click="changeDateValid"
             class="datepicker"
-            :class="{invalid: !isDateValid}"
+            :class="{ invalid: !isDateValid }"
           />
         </div>
 
@@ -95,7 +96,7 @@ export default {
     name: "",
     mission: "",
     days: 1,
-    isMultiple: null,
+    isMultiple: "0",
     isDateValid: true,
     formData: {}
   }),
@@ -121,6 +122,8 @@ export default {
 
   methods: {
     async submitHandler() {
+      // Валидация формы
+
       this.updateSelectInputClass();
       const datepickerValue = this.getDatepickerValue();
       this.isDateValid = !!datepickerValue;
@@ -129,7 +132,11 @@ export default {
         this.$v.$touch();
         return;
       }
-      const formatDate = Date.parse(datepickerValue.split("-").reverse());
+
+      // Приведение данных к нужному формату
+
+      const formatDate =
+        Date.parse(datepickerValue.split("-").reverse()) / 1000;
       const formatIsMultiple = !!+this.isMultiple;
 
       this.formData = {
@@ -139,17 +146,15 @@ export default {
         mission: this.mission,
         isMultiple: formatIsMultiple
       };
+
+      // Запрос на добавление данных в таблицу
+
       await this.$store.dispatch("addAstronaut", this.formData);
 
-      this.name = "";
-      this.mission = "";
-      this.days = 1;
-      this.isMultiple = null;
-      this.isDateValid = true;
-      this.formData = {};
-      const datepicker = document.querySelector(".datepicker");
-      let instance = M.Datepicker.getInstance(datepicker);
-      instance.destroy();
+      // Сброс валидации и приведение данных к изначальному виду
+
+      this.resetFormData();
+      this.resetDatepicker();
       this.$v.$reset();
       this.$message("Космонавт успешно добавлен в таблицу!");
     },
@@ -173,6 +178,22 @@ export default {
       const datepicker = document.querySelector(".datepicker");
       let instance = M.Datepicker.getInstance(datepicker);
       return instance.toString();
+    },
+
+    // Сброс данных после добавления
+    resetDatepicker() {
+      const datepicker = document.querySelector(".datepicker");
+      let instance = M.Datepicker.getInstance(datepicker);
+      instance.setDate(null);
+      datepicker.value = null;
+    },
+    resetFormData() {
+      this.name = "";
+      this.mission = "";
+      this.days = 1;
+      this.isMultiple = "0";
+      this.isDateValid = true;
+      this.formData = {};
     }
   }
 };
@@ -185,7 +206,7 @@ export default {
   border-radius: 5px;
   padding: 40px 0;
   margin-bottom: 100px;
-  animation: fade-up 0.4s ease-in-out;
+  animation: fade-up 0.3s ease-in-out;
 }
 .addForm__title {
   color: #334669;
@@ -211,11 +232,11 @@ export default {
 @keyframes fade-up {
   0% {
     opacity: 0;
-    transform: translateX(-100px);
+    transform: translateY(20px);
   }
   100% {
     opacity: 1;
-    transform: translateX(0px);
+    transform: translateY(0px);
   }
 }
 </style>

@@ -1,30 +1,29 @@
 <template>
   <div class="astronautTable">
-    <table class="responsive-table">
+    <table class="table">
       <thead>
         <tr>
           <th>#</th>
-
-          <th class="sortRow" @click="sortByName">
-            <div class="test">
+          <th @click="sort('name')">
+            <div class="header-cell">
               Имя
               <i class="small material-icons">arrow_drop_down</i>
             </div>
           </th>
-          <th class="sortRow" @click="sortByMissions">
-            <div class="test">
+          <th @click="sort('missions')">
+            <div class="header-cell">
               Миссии
               <i class="small material-icons">arrow_drop_down</i>
             </div>
           </th>
-          <th class="sortRow" @click="sortByDay">
-            <div class="test">
+          <th @click="sort('days')">
+            <div class="header-cell">
               Дней в космосе
               <i class="small material-icons">arrow_drop_down</i>
             </div>
           </th>
-          <th class="sortRow" @click="sortByDate">
-            <div class="test">
+          <th @click="sort('date')">
+            <div class="header-cell">
               Первый полет
               <i class="small material-icons">arrow_drop_down</i>
             </div>
@@ -36,12 +35,18 @@
 
       <tbody>
         <tr v-for="(person, idx) of table" :key="idx">
-          <td>{{ idx + 1 }}</td>
-          <td>{{ person.name }}</td>
-          <td>{{ person.mission }}</td>
-          <td>{{ person.days }}</td>
+          <td>{{ counter + idx + 1 }}</td>
+          <td class="shortText">
+            <div class="shortText__inner">{{ person.name }}</div>
+          </td>
+          <td class="shortText">
+            <div class="shortText__inner">{{ person.mission }}</div>
+          </td>
+          <td class="shortText">
+            <div class="shortText__inner">{{ person.days }}</div>
+          </td>
           <td>{{ person.date | date() }}</td>
-          <td>{{ person.isMultiple?"Да":"Нет" }}</td>
+          <td>{{ person.isMultiple ? "Да" : "Нет" }}</td>
           <td>
             <a
               class="btn waves-effect waves-light red lighten-2"
@@ -59,50 +64,31 @@
 <script>
 export default {
   name: "AstronautTable",
-  data: () => ({
-    loading: true,
-    tableHeader: [
-      { text: "Имя", attr: "name" },
-      { text: "Миссии", attr: "mission" },
-      { text: "Дней в космосе", attr: "days" },
-      { text: "Первый полет", attr: "date" }
-    ]
-  }),
+
   props: {
-    table: Array
+    table: Array,
+    counter: Number
   },
   methods: {
     deleteById(event) {
       let $delButton = event.target;
       if (event.target.tagName === "I") $delButton = event.target.parentNode;
       const name = $delButton.dataset.id;
+      this.$message("Космонавт по имени: " + name + " был удален из таблицы");
+      this.$store.dispatch("delAstronaut", name);
+    },
 
-      this.$store.commit("deleteAstronautById", name);
-    },
-    sortByName(event) {
+    sort(type) {
       this.updateArrowClass(event);
-      const astronauts = this.$store.state.astronauts;
-      const type = "name";
-      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
+      const astronauts = this.$store.state.filteredAstronauts;
+      const counters = this.$store.state.sorting.counters;
+      this.$store.dispatch("sortingAstronautsList", {
+        astronauts,
+        type,
+        counters
+      });
     },
-    sortByMissions() {
-      this.updateArrowClass(event);
-      const astronauts = this.$store.state.astronauts;
-      const type = "missions";
-      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
-    },
-    sortByDay(event) {
-      this.updateArrowClass(event);
-      const astronauts = this.$store.state.astronauts;
-      const type = "days";
-      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
-    },
-    sortByDate(event) {
-      this.updateArrowClass(event);
-      const astronauts = this.$store.state.astronauts;
-      const type = "date";
-      this.$store.dispatch("sortingAstronautsList", { astronauts, type });
-    },
+
     updateArrowClass(event) {
       let arrowParent = event.target;
       if (event.target.tagName === "I") arrowParent = event.target.parentNode;
@@ -112,17 +98,20 @@ export default {
 };
 </script>
 <style scoped>
-.test {
+.header-cell {
   display: flex;
   align-items: center;
   cursor: pointer;
   user-select: none;
+  width: 100%;
+  height: 100%;
 }
-.test i {
+
+.header-cell i {
   transform: rotateZ(0deg);
   transition: all 0.3s ease;
 }
-.test.up i {
+.header-cell.up i {
   transform: rotateZ(540deg);
 }
 
@@ -135,5 +124,30 @@ export default {
 }
 .btn {
   user-select: none;
+}
+.table {
+  transition: all 0.4s ease;
+}
+.shortText {
+  max-width: 150px;
+}
+.shortText:last-of-type {
+  max-width: 130px;
+}
+.shortText__inner {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.astronautTable {
+  animation: fade-left 0.3s ease-in-out;
+}
+@keyframes fade-left {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>

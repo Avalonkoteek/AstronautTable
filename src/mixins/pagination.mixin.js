@@ -13,17 +13,18 @@ export default {
       this.allItems = this.chunk(allItems, this.pageSize - 1);
       this.pageCount = this.allItems.length;
       this.items = this.allItems[this.page - 1] || this.allItems[0];
-      // if (!this.items.length && this.allItems.length && this.page > 1) {
-      //   this.pageCount = --this.pageCount;
-      //   this.pageCount = --this.page;
-      //   this.items = this.allItems[this.page - 1];
-      // }
-      console.log(this.items);
+      if (this.allItems[this.allItems.length - 1].length === 0) {
+        if (this.page === this.pageCount) {
+          this.page = this.page - 1 || 1;
+        }
+        this.pageCount = this.pageCount - 1 || 0;
+        this.items = this.allItems[this.page - 1] || this.allItems[0];
+      }
     },
 
     listChangeHandler(page) {
-      this.items = this.allItems[page - 1] || this.allItems[0];
       this.page = page;
+      this.items = this.allItems[page - 1] || this.allItems[0];
     },
     chunk(arr, size) {
       return arr.reduce(

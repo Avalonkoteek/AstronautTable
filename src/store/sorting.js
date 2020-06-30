@@ -1,6 +1,21 @@
 export default {
+  state: {
+    counters: {
+      name: 0,
+      missions: 0,
+      days: 0,
+      date: 0,
+    },
+  },
+  mutations: {
+    counterAdd: (state, counterName) => {
+      state.counters[counterName]++;
+    },
+  },
   actions: {
-    sortingAstronautsList({ commit }, { astronauts, type }) {
+    sortingAstronautsList({ commit }, { astronauts, type, counters }) {
+      commit("counterAdd", type);
+      let counter = counters[type];
       let newData = astronauts;
       if (type === "missions") {
         newData.sort((a, b) => {
@@ -18,14 +33,14 @@ export default {
         });
       } else {
         newData.sort((prev, next) => {
-          console.log(prev[`"${type}"`], type);
           if (prev[type] > next[type]) return 1;
           if (prev[type] < next[type]) return -1;
           return 0;
         });
       }
 
-      commit("setAstronautToState", newData);
+      if (counter % 2 === 0) newData = newData.reverse();
+      commit("setArrFilter", newData);
     },
   },
 };
